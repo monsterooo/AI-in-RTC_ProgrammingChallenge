@@ -34,8 +34,8 @@ const renderComponent = (req, res) => {
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
       <style>${css}</style>
-      
-      <script src="${process.env.ROOT_URL}/static/agora/AgoraRTCSDK-2.8.0.js"></script>
+      <link rel="stylesheet" href="//at.alicdn.com/t/font_1128639_6gldv9p359j.css">
+      <script src="${process.env.ROOT_URL}/static/agora/AgoraRTCSDK-2.6.1.js"></script>
       <script src="${process.env.ROOT_URL}/static/vscode-editor/min/vs/loader.js"></script>
       <script>
         require.config({ paths: { 'vs': '/static/vscode-editor/min/vs' }});

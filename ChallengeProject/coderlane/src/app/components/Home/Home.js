@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import io from 'socket.io-client';
 import SplitPane from 'react-split-pane';
 import ReactNotification from "react-notifications-component";
-import { If } from 'react-statements';
 import {
   socketConnect,
   runStatus,
@@ -16,13 +15,14 @@ import {
   updateSandbox,
 } from 'app/actions';
 import { getFirstBuffer, getLastBuffer, debug } from 'app/utils';
+import { getToken } from '../../actions';
 import Header from '../Header/Header';
 import WorkSpace from '../WorkSpace';
 import TopBar from '../WorkSpace/TopBar';
 import Print from '../Print';
 import Sandboxes from '../Sandboxes';
 import Snippet from '../Snippet';
-import Live from '../Live';
+import Agora from '../Live/Agora';
 
 const splitPaneStyle = {
   overflow: 'visible'
@@ -36,6 +36,7 @@ class Home extends React.Component {
       height: 0,
       openLive: false,
     };
+    this.agora = null;
     this.inited = false;
     this.notificationDOMRef = React.createRef();
   }
@@ -327,16 +328,20 @@ class Home extends React.Component {
       localStorage.removeItem('lang');
     }
   }
+  getAgora = node => {
+    this.agora = node;
+  }
   openLive = () => {
-    const { openLive } = this.state;
+    const { getTokenAction, sandbox: { _id } } = this.props;
 
-    !openLive && this.setState({ openLive: true });
+    getTokenAction({ uid: this.socket.id, channel: _id });
+    
   }
   render() {
-    const { width, height, openLive } = this.state;
+    const { width, height } = this.state;
     const {
-      sandbox: { lang },
-      app: { socketConnect, snippetOpen, sandboxOpen },
+      sandbox: { lang, _id },
+      app: { token, socketConnect, snippetOpen, sandboxOpen },
       snippetOpenAction,
       sandboxAction,
       updateSandbox,
@@ -392,9 +397,8 @@ class Home extends React.Component {
         <Snippet isOpen={snippetOpen} onClose={snippetOpenAction} />
         <Sandboxes isOpen={sandboxOpen} onClose={sandboxAction} />
         <ReactNotification ref={this.notificationDOMRef} />
-        <If when={openLive}>
-          <Live />
-        </If>
+        
+        <Agora ref={this.getAgora} token={token} channel={_id} uid={_.get(this, 'socket.id')} />
       </div>
     )
   }
@@ -414,6 +418,7 @@ const mapDispatchToProps = dispatch => ({
   updateLangAction: bindActionCreators(updateLang, dispatch),
   createSandboxAction: bindActionCreators(createSandboxAction, dispatch),
   updateSandbox: bindActionCreators(updateSandbox, dispatch),
+  getTokenAction: bindActionCreators(getToken, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
